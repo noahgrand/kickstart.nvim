@@ -383,7 +383,9 @@ require('lazy').setup({
       -- Automatically install LSPs and related tools to stdpath for Neovim
       -- Mason must be loaded before its dependents so we need to set it up here.
       -- NOTE: `opts = {}` is the same as calling `require('mason').setup({})`
-      { 'williamboman/mason.nvim', opts = {} },
+      { 'williamboman/mason.nvim', opts = {
+        ensure_installed = { 'markdownlint-cli2', 'markdown-toc' },
+      } },
       'williamboman/mason-lspconfig.nvim',
       'WhoIsSethDaniel/mason-tool-installer.nvim',
 
@@ -573,7 +575,8 @@ require('lazy').setup({
       --  - settings (table): Override the default settings passed when initializing the server.
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
-        -- clangd = {},
+        clangd = {},
+        marksman = {},
         -- gopls = {},
         -- pyright = {},
         -- rust_analyzer = {},
@@ -669,8 +672,29 @@ require('lazy').setup({
           lsp_format = lsp_format_opt,
         }
       end,
+      formatters = {
+        ['markdown-toc'] = {
+          condition = function(_, ctx)
+            for _, line in ipairs(vim.api.nvim_buf_get_lines(ctx.buf, 0, -1, false)) do
+              if line:find '<!%-%- toc %-%->' then
+                return true
+              end
+            end
+          end,
+        },
+        ['markdownlint-cli2'] = {
+          condition = function(_, ctx)
+            local diag = vim.tbl_filter(function(d)
+              return d.source == 'markdownlint'
+            end, vim.diagnostic.get(ctx.buf))
+            return #diag > 0
+          end,
+        },
+      },
       formatters_by_ft = {
         lua = { 'stylua' },
+        ['markdown'] = { 'prettier', 'markdownlint-cli2', 'markdown-toc' },
+        ['markdown.mdx'] = { 'prettier', 'markdownlint-cli2', 'markdown-toc' },
         -- Conform can also run multiple formatters sequentially
         -- python = { "isort", "black" },
         --
