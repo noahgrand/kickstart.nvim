@@ -578,7 +578,8 @@ require('lazy').setup({
         clangd = {},
         marksman = {},
         -- gopls = {},
-        -- pyright = {},
+        pyright = {},
+        tinymist = {},
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
@@ -897,7 +898,22 @@ require('lazy').setup({
     end,
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
     opts = {
-      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' },
+      ensure_installed = {
+        'bash',
+        'c',
+        'diff',
+        'html',
+        'javacsript',
+        'lua',
+        'luadoc',
+        'markdown',
+        'markdown_inline',
+        'python',
+        'query',
+        'typst',
+        'vim',
+        'vimdoc',
+      },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
@@ -976,6 +992,17 @@ vim.keymap.set('n', '<leader>.cc', '<cmd>let @+="cd " . expand("%:p:h")<CR>', { 
 vim.api.nvim_create_user_command('Box', function(args)
   vim.api.nvim_feedkeys('i[ ] ', 'n', false)
 end, { nargs = '*' })
+
+-- Typst configuration
+vim.keymap.set('n', '<leader>p', ':TypstPreview<CR>', { buffer = 0 })
+
+vim.cmd [[
+	"setlocal wrapmargin=10
+	"setlocal formatoptions+=t
+	"setlocal linebreak
+	setlocal spell
+	"setlocal wrap
+]]
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 etn
